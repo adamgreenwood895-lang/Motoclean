@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MotoFlow Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
 
+<body class="motoflow">
+  <div class="dashboard-shell">
+
+    <header class="dashboard-header">
+      <div>
+        <div class="dashboard-label">MotoFlow</div>
+        <h1>Workshop Dashboard</h1>
+      </div>
+
+      <button class="header-back" onclick="window.location.href='index.html'">
+        Back
+      </button>
+    </header>
+
+    <section class="overview-bar">
+      <div class="overview-card">
+        <span>Live Jobs</span>
+        <strong id="liveJobsCount">0</strong>
+      </div>
+
+      <div class="overview-card">
+        <span>In Progress</span>
+        <strong id="progressJobsCount">0</strong>
+      </div>
+
+      <div class="overview-card">
+        <span>Ready</span>
+        <strong id="readyJobsCount">0</strong>
+      </div>
+    </section>
+
+    <section class="jobs-section">
+      <div id="jobList" class="job-grid"></div>
+    </section>
+
+    <aside id="jobPanel" class="job-panel hidden">
+      <div class="job-panel-header">
+        <h2>Job Details</h2>
+        <button id="closePanel" class="icon-button">×</button>
+      </div>
+
+      <label class="panel-label">Description / Actions</label>
+
+      <textarea
+        id="jobDesc"
+        placeholder="Add notes, actions, parts fitted, customer updates..."
+      ></textarea>
+
+      <div class="panel-actions">
+        <button id="saveJob" class="primary-button">
+          Save Changes
+        </button>
+      </div>
+    </aside>
+
+    <div id="toast" class="toast"></div>
+
+    <button
+      id="dashboardMic"
+      class="dashboard-mic"
+      type="button"
+      aria-label="Voice command"
+    >
+      🎤
+    </button>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
