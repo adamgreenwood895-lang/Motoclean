@@ -16,27 +16,19 @@ body {
 }
 
 body.motoflow {
-  background:
-    linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.82)),
-    url('assets/motoflow-bg.jpg') center center / cover no-repeat fixed;
+  background: linear-gradient(135deg, #101820, #1d2a38);
 }
 
 body.truckflow {
-  background:
-    linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.82)),
-    url('assets/truckflow-bg.jpg') center center / cover no-repeat fixed;
+  background: linear-gradient(135deg, #161616, #303030);
 }
 
 body.washflow {
-  background:
-    linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.82)),
-    url('assets/washflow-bg.jpg') center center / cover no-repeat fixed;
+  background: linear-gradient(135deg, #0f2333, #114b73);
 }
 
 body.autoflow {
-  background:
-    linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.82)),
-    url('assets/autoflow-bg.jpg') center center / cover no-repeat fixed;
+  background: linear-gradient(135deg, #1b1b1b, #4a0d0d);
 }
 
 .dashboard-shell {
