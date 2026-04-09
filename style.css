@@ -59,12 +59,3 @@ html, body {
   text-align: center;
   background: rgba(0,0,0,0.6);
 }
-/* Optional: status below output */
-.status {
-  position: absolute;
-  left: 50%;
-  bottom: 2%;
-  transform: translateX(-50%);
-  font-size: 14px;
-  color: #ccc;
-}
