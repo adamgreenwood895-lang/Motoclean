@@ -31,7 +31,7 @@ body {
 .tap-zone {
   position: absolute;
   left: 50%;
-  top: 67%;
+  top: 63%;
   transform: translate(-50%, -50%);
   width: min(36vw, 150px);
   aspect-ratio: 1;
