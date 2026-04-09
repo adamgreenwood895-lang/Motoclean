@@ -170,43 +170,26 @@ function updateExistingJobFromCommand(command) {
   showToast(`${job.reference} updated`);
 }
 
-function handleVoiceCommand(command) {
-  const lower = command.toLowerCase();
+function handleVoiceCommand(transcript) {
+  const command = transcript.toLowerCase().trim();
 
-  if (
-    lower.includes('new job') ||
-    lower.includes('create job') ||
-    lower.includes('book a job') ||
-    lower.includes('new booking')
-  ) {
-    createJobFromCommand(command);
+  const newJobWords = ["create", "new", "book", "add"];
+  const updateWords = ["update", "existing", "change", "complete", "ready", "progress"];
+
+  const isNewJob = newJobWords.some(word => command.includes(word));
+  const isUpdate = updateWords.some(word => command.includes(word));
+
+  if (isNewJob && !isUpdate) {
+    createJobFromVoice(transcript);
     return;
   }
 
-  if (lower.includes('update existing job for')) {
-    updateExistingJobFromCommand(command);
+  if (isUpdate) {
+    updateExistingJobFromVoice(transcript);
     return;
   }
 
-  if (selectedJobId) {
-    const job = jobs.find(j => j.id === selectedJobId);
-
-    if (!job) return;
-
-    job.description += `\nAction Added: ${command}`;
-
-    if (job.status === 'Pending') {
-      job.status = 'In Progress';
-    }
-
-    saveJobs();
-    renderJobs();
-    jobDescInput.value = job.description;
-    showToast('Action added');
-    return;
-  }
-
-  showToast('Command not recognised');
+  showToast("Command not recognised");
 }
 
 function initSpeechRecognition() {
