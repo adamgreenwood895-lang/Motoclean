@@ -1,3 +1,8 @@
+// ===========================
+// Dashboard JS - MotoFlow Final
+// ===========================
+
+// Elements
 const jobList = document.getElementById("jobList");
 const completedJobList = document.getElementById("completedJobList");
 const jobPanel = document.getElementById("jobPanel");
@@ -7,10 +12,25 @@ const closePanelBtn = document.getElementById("closePanel");
 const toast = document.getElementById("toast");
 const dashboardMic = document.getElementById("dashboardMic");
 
+// Current state
 let listening = false;
 let currentJobId = null;
 
-// --- Main mic recognition ---
+// ===========================
+// Auto-open job if coming from landing page
+// ===========================
+document.addEventListener("DOMContentLoaded", () => {
+  document.body.classList.add("motoflow"); // Apply skin
+  const landingJobId = localStorage.getItem("currentJobId");
+  if (landingJobId) {
+    openJobPanel(landingJobId);
+    localStorage.removeItem("currentJobId");
+  }
+});
+
+// ===========================
+// Main Mic Recognition
+// ===========================
 let recognition = null;
 if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -36,7 +56,9 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   };
 }
 
-// --- Wake-word listener ---
+// ===========================
+// Wake-word Recognition
+// ===========================
 let wakeRecognition = null;
 if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -58,7 +80,9 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   wakeRecognition.start();
 }
 
-// --- Handle commands ---
+// ===========================
+// Handle Voice Commands
+// ===========================
 function handleVoiceCommand(transcript) {
   const command = transcript.toLowerCase().trim();
   const newJobWords = ["create", "new", "book", "add"];
@@ -76,7 +100,8 @@ function handleVoiceCommand(transcript) {
     const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
     jobs.push(newJob);
     localStorage.setItem("jobs", JSON.stringify(jobs));
-    localStorage.setItem("currentJobId", newJob.id); // store new job id for auto panel
+
+    localStorage.setItem("currentJobId", newJob.id);
     window.location.href = "dashboard.html";
     return;
   }
@@ -90,12 +115,16 @@ function handleVoiceCommand(transcript) {
   showToast("Command not recognised");
 }
 
-// --- Job storage ---
+// ===========================
+// Job Storage Helpers
+// ===========================
 function getJobs() {
   return JSON.parse(localStorage.getItem("jobs") || "[]");
 }
 
-// --- Render jobs ---
+// ===========================
+// Render Jobs
+// ===========================
 function renderJobs() {
   const jobs = getJobs();
   const activeJobs = jobs.filter(j => j.status !== "Ready");
@@ -146,7 +175,9 @@ function renderJobs() {
   });
 }
 
-// --- Job panel ---
+// ===========================
+// Job Panel Functions
+// ===========================
 function openJobPanel(id) {
   const jobs = getJobs();
   const job = jobs.find(j => j.id === id);
@@ -170,7 +201,9 @@ function closePanel() {
   jobPanel.classList.add("hidden");
 }
 
-// --- Mark job ready ---
+// ===========================
+// Mark Ready / Delete
+// ===========================
 function markJobReady(id) {
   let jobs = getJobs();
   jobs = jobs.map(j => j.id === id ? { ...j, status: "Ready" } : j);
@@ -179,7 +212,6 @@ function markJobReady(id) {
   showToast("Job marked as completed");
 }
 
-// --- Delete job ---
 function deleteJob(id) {
   let jobs = getJobs();
   jobs = jobs.filter(j => j.id !== id);
@@ -188,7 +220,9 @@ function deleteJob(id) {
   showToast("Job deleted");
 }
 
-// --- Open existing job via command ---
+// ===========================
+// Open existing job via command
+// ===========================
 function openExistingJobPanel(command) {
   const jobs = getJobs();
   const job = jobs.find(j => command.includes(j.description.toLowerCase()));
@@ -200,33 +234,25 @@ function openExistingJobPanel(command) {
   }
 }
 
-// --- Toast ---
+// ===========================
+// Toast Notification
+// ===========================
 function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2000);
 }
 
-// --- Event listeners ---
+// ===========================
+// Event Listeners
+// ===========================
 saveJobBtn.addEventListener("click", saveJob);
 closePanelBtn.addEventListener("click", closePanel);
 dashboardMic.addEventListener("click", () => {
   if (recognition && !listening) recognition.start();
 });
 
-// --- INITIAL RENDER ---
+// ===========================
+// Initial Render
+// ===========================
 renderJobs();
-
-// --- AUTO APPLY SKIN AND OPEN JOB PANEL ---
-document.addEventListener("DOMContentLoaded", () => {
-  // Apply garage skin
-  const garageType = localStorage.getItem("garageType") || "motoflow"; // default
-  document.body.classList.add(garageType);
-
-  // Auto open job panel if redirected from landing page
-  const landingJobId = localStorage.getItem("currentJobId");
-  if (landingJobId) {
-    openJobPanel(landingJobId);
-    localStorage.removeItem("currentJobId"); // clear after opening
-  }
-});
