@@ -1,18 +1,17 @@
-/* Reset & base */
+/* Base body / dashboard */
 body, html {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
   height: 100%;
-  background: url('assets/motoflow-bg.jpg') center/cover no-repeat; /* Change per garage skin */
   color: #fff;
 }
 
-/* Semi-transparent container */
+/* Dashboard container */
 .dashboard {
   padding: 20px;
   min-height: 100vh;
-  background: rgba(0,0,0,0.65);
+  border-radius: 12px;
 }
 
 /* Header */
@@ -37,7 +36,7 @@ header h1 {
   cursor: pointer;
 }
 
-/* Jobs sections */
+/* Jobs section */
 .jobs-section {
   margin-bottom: 30px;
 }
@@ -46,7 +45,7 @@ header h1 {
   margin-bottom: 10px;
 }
 
-/* Job lists */
+/* Job list */
 .job-list {
   max-height: 300px;
   overflow-y: auto;
@@ -55,12 +54,10 @@ header h1 {
   gap: 10px;
 }
 
-/* Job cards */
+/* Job card */
 .job-card {
-  background: rgba(255,255,255,0.1);
   padding: 12px 16px;
   border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -68,18 +65,6 @@ header h1 {
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.job-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-}
-
-.job-card.completed {
-  background: rgba(255,255,255,0.05);
-  color: #aaa;
-  cursor: default;
-}
-
-/* Job card text */
 .job-card p:first-child {
   font-weight: bold;
   font-size: 1.1rem;
@@ -92,7 +77,6 @@ header h1 {
   text-overflow: ellipsis;
 }
 
-/* Buttons */
 .job-card button {
   margin-left: 5px;
   padding: 6px 10px;
@@ -102,15 +86,8 @@ header h1 {
   font-size: 0.9rem;
 }
 
-.job-card .mark-ready-btn {
-  background: #28a745;
-  color: white;
-}
-
-.job-card .delete-btn {
-  background: #dc3545;
-  color: white;
-}
+.job-card .mark-ready-btn { color: white; }
+.job-card .delete-btn { color: white; }
 
 /* Job panel */
 .job-panel {
@@ -120,15 +97,10 @@ header h1 {
   width: 320px;
   max-width: 90%;
   transform: translate(-50%, -50%);
-  background: #1a1a1a;
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.5);
   padding: 20px;
   z-index: 100;
-}
-
-.job-panel.hidden {
-  display: none;
 }
 
 .job-panel textarea {
@@ -137,12 +109,9 @@ header h1 {
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #555;
-  background: #222;
-  color: #fff;
   margin-bottom: 10px;
 }
 
-/* Panel buttons */
 .panel-buttons {
   display: flex;
   justify-content: flex-end;
@@ -156,15 +125,8 @@ header h1 {
   cursor: pointer;
 }
 
-.panel-buttons #saveJob {
-  background: #007bff;
-  color: white;
-}
-
-.panel-buttons #closePanel {
-  background: #6c757d;
-  color: white;
-}
+.panel-buttons #saveJob { color: white; }
+.panel-buttons #closePanel { color: white; }
 
 /* Toast */
 .toast {
@@ -172,17 +134,53 @@ header h1 {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0,0,0,0.85);
-  color: #fff;
   padding: 10px 20px;
   border-radius: 8px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s;
   z-index: 999;
+  color: white;
 }
 
-.toast.show {
-  opacity: 1;
-  pointer-events: auto;
+/* ---------- Garage skins ---------- */
+
+/* MotoFlow */
+body.motoflow {
+  background: url('assets/motoflow-bg.jpg') center/cover no-repeat;
 }
+
+body.motoflow .dashboard { background: rgba(0,0,0,0.65); }
+body.motoflow .job-card { background: rgba(255,255,255,0.1); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+body.motoflow .job-card.completed { background: rgba(255,255,255,0.05); color: #aaa; }
+body.motoflow .job-panel { background: #1a1a1a; }
+
+/* TruckFlow */
+body.truckflow {
+  background: url('assets/truckflow-bg.jpg') center/cover no-repeat;
+}
+
+body.truckflow .dashboard { background: rgba(0,0,0,0.7); }
+body.truckflow .job-card { background: rgba(255,255,255,0.15); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
+body.truckflow .job-card.completed { background: rgba(255,255,255,0.08); color: #ccc; }
+body.truckflow .job-panel { background: #111; }
+
+/* WashFlow */
+body.washflow {
+  background: url('assets/washflow-bg.jpg') center/cover no-repeat;
+}
+
+body.washflow .dashboard { background: rgba(0,0,0,0.6); }
+body.washflow .job-card { background: rgba(255,255,255,0.12); box-shadow: 0 6px 12px rgba(0,0,0,0.35); }
+body.washflow .job-card.completed { background: rgba(255,255,255,0.06); color: #bbb; }
+body.washflow .job-panel { background: #222; }
+
+/* AutoFlow */
+body.autoflow {
+  background: url('assets/autoflow-bg.jpg') center/cover no-repeat;
+}
+
+body.autoflow .dashboard { background: rgba(0,0,0,0.65); }
+body.autoflow .job-card { background: rgba(255,255,255,0.13); box-shadow: 0 6px 12px rgba(0,0,0,0.38); }
+body.autoflow .job-card.completed { background: rgba(255,255,255,0.07); color: #ccc; }
+body.autoflow .job-panel { background: #1b1b1b; }
