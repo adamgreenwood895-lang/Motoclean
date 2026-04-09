@@ -16,7 +16,7 @@ body {
 .bg {
   position: fixed;
   inset: 0;
-  background: url('assets/bgnew.png') center center / cover no-repeat;
+  background: url('assets/bgnew.jpg') center center / cover no-repeat;
   filter: brightness(0.8) saturate(1.15);
   transform: scale(1.02);
 }
