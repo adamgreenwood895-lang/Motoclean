@@ -6,8 +6,11 @@ const statusEl = document.getElementById("status");
 
 let recognition = null;
 
+// ---------------- SPEECH RECOGNITION ----------------
 if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = false;
@@ -21,33 +24,49 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   };
 
   recognition.onresult = (event) => {
-    const text = event.results[0][0].transcript;
+    const text = event.results[0][0].transcript.trim();
+
     output.textContent = text;
     statusEl.textContent = "Command captured.";
 
-    // --- Handle voice commands for new/update jobs ---
     handleCommand(text);
   };
 
   recognition.onerror = () => {
+    listening = false;
+    tapZone.classList.remove("listening");
     statusEl.textContent = "Mic error. Try again.";
   };
 
   recognition.onend = () => {
     listening = false;
     tapZone.classList.remove("listening");
-    if (!output.textContent || output.textContent === "Listening...") {
+
+    if (
+      !output.textContent ||
+      output.textContent === "Listening..."
+    ) {
       output.textContent = "Tap the mic and say a command.";
+    }
+
+    if (statusEl.textContent === "Speak a command now.") {
+      statusEl.textContent = "";
     }
   };
 } else {
-  statusEl.textContent = "Speech recognition not supported in this browser.";
+  statusEl.textContent =
+    "Speech recognition not supported in this browser.";
 }
 
+// ---------------- TAP ZONE ----------------
 tapZone.addEventListener("click", () => {
   if (!recognition) return;
-  if (!listening) recognition.start();
-  else recognition.stop();
+
+  if (!listening) {
+    recognition.start();
+  } else {
+    recognition.stop();
+  }
 });
 
 // ---------------- COMMAND HANDLER ----------------
@@ -57,7 +76,7 @@ function handleCommand(command) {
   const newJobWords = ["create", "new", "book", "add"];
   const updateWords = ["update", "existing", "change", "complete", "ready"];
 
-  // --- NEW JOB ---
+  // ---------- CREATE NEW JOB ----------
   if (newJobWords.some(word => cmd.includes(word))) {
     const newJob = {
       id: Date.now().toString(),
@@ -66,25 +85,59 @@ function handleCommand(command) {
       status: "Pending",
       actions: []
     };
+
     const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+
     jobs.push(newJob);
     localStorage.setItem("jobs", JSON.stringify(jobs));
+
+    // Tell dashboard which job to open
+    localStorage.setItem("currentJobId", newJob.id);
+
+    output.textContent = `Created ${newJob.reference}`;
+    statusEl.textContent = "Opening dashboard...";
 
     window.location.href = "dashboard.html";
     return;
   }
 
-  // --- UPDATE EXISTING JOB ---
+  // ---------- UPDATE EXISTING JOB ----------
   if (updateWords.some(word => cmd.includes(word))) {
-    // open dashboard and find matching job
     const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
-    const job = jobs.find(j => cmd.includes(j.description.toLowerCase()));
-    if (job) {
-      localStorage.setItem("currentJobId", job.id);
+
+    const matchedJob = jobs.find(job => {
+      const description = job.description.toLowerCase();
+      const reference = job.reference.toLowerCase();
+
+      // Match reference directly
+      if (cmd.includes(reference)) return true;
+
+      // Match significant words from description
+      const importantWords = description
+        .split(" ")
+        .filter(word => word.length > 3);
+
+      return importantWords.some(word => cmd.includes(word));
+    });
+
+    if (matchedJob) {
+      localStorage.setItem("currentJobId", matchedJob.id);
+
+      output.textContent = `Opening ${matchedJob.reference}`;
+      statusEl.textContent = "Opening dashboard...";
+
       window.location.href = "dashboard.html";
       return;
     } else {
-      output.textContent = "No matching job found";
+      output.textContent = "No matching job found.";
+      statusEl.textContent =
+        "Try saying the customer name, bike model or job number.";
+      return;
     }
   }
-}
+
+  // ---------- UNKNOWN COMMAND ----------
+  output.textContent = "Command not recognised.";
+  statusEl.textContent =
+    "Try: 'Create new job for...' or 'Update John Smith Ducati job'";
+    }
