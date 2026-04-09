@@ -1,59 +1,90 @@
-const tapZone = document.getElementById('tapZone');
-const output = document.getElementById('output');
-const statusText = document.getElementById('status');
+let listening = false;
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const tapZone = document.getElementById("tapZone");
+const output = document.getElementById("output");
+const statusEl = document.getElementById("status");
 
-if (!SpeechRecognition) {
-  output.textContent = 'Speech recognition is not supported in this browser.';
-} else {
-  const recognition = new SpeechRecognition();
+let recognition = null;
 
-  recognition.lang = 'en-GB';
+if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = false;
+  recognition.lang = "en-GB";
 
   recognition.onstart = () => {
-    tapZone.classList.add('listening');
-    statusText.textContent = 'Listening';
-    output.textContent = 'Speak now...';
-  };
-
-  recognition.onend = () => {
-    tapZone.classList.remove('listening');
-    statusText.textContent = '';
-  };
-
-  recognition.onerror = () => {
-    tapZone.classList.remove('listening');
-    statusText.textContent = '';
-    output.textContent = 'Sorry, I could not hear that. Please try again.';
+    listening = true;
+    output.textContent = "Listening...";
+    statusEl.textContent = "Speak a command now.";
+    tapZone.classList.add("listening");
   };
 
   recognition.onresult = (event) => {
-    const command = event.results[0][0].transcript.trim();
-    const lower = command.toLowerCase();
+    const text = event.results[0][0].transcript;
+    output.textContent = text;
+    statusEl.textContent = "Command captured.";
 
-    output.textContent = command;
-
-    const isNewJob =
-      lower.includes('new job') ||
-      lower.includes('create job') ||
-      lower.includes('book a job') ||
-      lower.includes('new booking');
-
-    const isUpdateJob = lower.includes('update existing job for');
-
-    if (isNewJob || isUpdateJob) {
-      sessionStorage.setItem('voiceCommand', command);
-      window.location.href = 'dashboard.html';
-      return;
-    }
-
-    output.textContent = 'Command recognised, but no matching action exists yet.';
+    // --- Handle voice commands for new/update jobs ---
+    handleCommand(text);
   };
 
-  tapZone.addEventListener('click', () => {
-    recognition.start();
-  });
+  recognition.onerror = () => {
+    statusEl.textContent = "Mic error. Try again.";
+  };
+
+  recognition.onend = () => {
+    listening = false;
+    tapZone.classList.remove("listening");
+    if (!output.textContent || output.textContent === "Listening...") {
+      output.textContent = "Tap the mic and say a command.";
+    }
+  };
+} else {
+  statusEl.textContent = "Speech recognition not supported in this browser.";
+}
+
+tapZone.addEventListener("click", () => {
+  if (!recognition) return;
+  if (!listening) recognition.start();
+  else recognition.stop();
+});
+
+// ---------------- COMMAND HANDLER ----------------
+function handleCommand(command) {
+  const cmd = command.toLowerCase();
+
+  const newJobWords = ["create", "new", "book", "add"];
+  const updateWords = ["update", "existing", "change", "complete", "ready"];
+
+  // --- NEW JOB ---
+  if (newJobWords.some(word => cmd.includes(word))) {
+    const newJob = {
+      id: Date.now().toString(),
+      reference: `Job-${Date.now()}`,
+      description: command,
+      status: "Pending",
+      actions: []
+    };
+    const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+    jobs.push(newJob);
+    localStorage.setItem("jobs", JSON.stringify(jobs));
+
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  // --- UPDATE EXISTING JOB ---
+  if (updateWords.some(word => cmd.includes(word))) {
+    // open dashboard and find matching job
+    const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+    const job = jobs.find(j => cmd.includes(j.description.toLowerCase()));
+    if (job) {
+      localStorage.setItem("currentJobId", job.id);
+      window.location.href = "dashboard.html";
+      return;
+    } else {
+      output.textContent = "No matching job found";
+    }
+  }
 }
