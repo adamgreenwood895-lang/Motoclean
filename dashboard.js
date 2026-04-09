@@ -227,7 +227,54 @@ function initSpeechRecognition() {
     handleVoiceCommand(command);
   };
 }
+let wakeRecognition = null;
 
+if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+  const WakeSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  wakeRecognition = new WakeSpeechRecognition();
+  wakeRecognition.continuous = true;
+  wakeRecognition.interimResults = false;
+  wakeRecognition.lang = "en-GB";
+
+  wakeRecognition.onresult = (event) => {
+    const transcript = event.results[event.results.length - 1][0].transcript
+      .toLowerCase()
+      .trim();
+
+    const wakePhrases = [
+      "activate dashboard mic",
+      "open dashboard mic",
+      "start listening",
+      "moto listen",
+      "motoflow listen"
+    ];
+
+    const matchedWake = wakePhrases.some(phrase => transcript.includes(phrase));
+
+    if (matchedWake) {
+      showToast("Listening...");
+
+      if (recognition) {
+        recognition.start();
+      }
+    }
+  };
+
+  wakeRecognition.onend = () => {
+    setTimeout(() => {
+      try {
+        wakeRecognition.start();
+      } catch (e) {}
+    }, 500);
+  };
+
+  window.addEventListener("load", () => {
+    try {
+      wakeRecognition.start();
+    } catch (e) {}
+  });
+}
 dashboardMic.addEventListener('click', () => {
   if (!recognition) return;
 
