@@ -1,8 +1,4 @@
-// ===========================
-// Dashboard JS - MotoFlow Final
-// ===========================
-
-// Elements
+// --- DOM elements ---
 const jobList = document.getElementById("jobList");
 const completedJobList = document.getElementById("completedJobList");
 const jobPanel = document.getElementById("jobPanel");
@@ -12,25 +8,17 @@ const closePanelBtn = document.getElementById("closePanel");
 const toast = document.getElementById("toast");
 const dashboardMic = document.getElementById("dashboardMic");
 
-// Current state
 let listening = false;
 let currentJobId = null;
 
-// ===========================
-// Auto-open job if coming from landing page
-// ===========================
-document.addEventListener("DOMContentLoaded", () => {
-  document.body.classList.add("motoflow"); // Apply skin
-  const landingJobId = localStorage.getItem("currentJobId");
-  if (landingJobId) {
-    openJobPanel(landingJobId);
-    localStorage.removeItem("currentJobId");
-  }
-});
+// --- Get landing page job ID if present ---
+const landingJobId = localStorage.getItem("currentJobId");
+if (landingJobId) {
+  currentJobId = landingJobId;
+  localStorage.removeItem("currentJobId");
+}
 
-// ===========================
-// Main Mic Recognition
-// ===========================
+// --- Speech recognition for dashboard ---
 let recognition = null;
 if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -51,14 +39,10 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
 
   recognition.onerror = () => showToast("Mic error. Try again.");
 
-  recognition.onend = () => {
-    listening = false;
-  };
+  recognition.onend = () => listening = false;
 }
 
-// ===========================
-// Wake-word Recognition
-// ===========================
+// --- Wake-word listener ---
 let wakeRecognition = null;
 if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -76,13 +60,11 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
     }
   };
 
-  wakeRecognition.onend = () => wakeRecognition.start(); // always restart
+  wakeRecognition.onend = () => wakeRecognition.start();
   wakeRecognition.start();
 }
 
-// ===========================
-// Handle Voice Commands
-// ===========================
+// --- Handle voice commands ---
 function handleVoiceCommand(transcript) {
   const command = transcript.toLowerCase().trim();
   const newJobWords = ["create", "new", "book", "add"];
@@ -115,16 +97,12 @@ function handleVoiceCommand(transcript) {
   showToast("Command not recognised");
 }
 
-// ===========================
-// Job Storage Helpers
-// ===========================
+// --- Job storage ---
 function getJobs() {
   return JSON.parse(localStorage.getItem("jobs") || "[]");
 }
 
-// ===========================
-// Render Jobs
-// ===========================
+// --- Render jobs ---
 function renderJobs() {
   const jobs = getJobs();
   const activeJobs = jobs.filter(j => j.status !== "Ready");
@@ -175,9 +153,7 @@ function renderJobs() {
   });
 }
 
-// ===========================
-// Job Panel Functions
-// ===========================
+// --- Job panel ---
 function openJobPanel(id) {
   const jobs = getJobs();
   const job = jobs.find(j => j.id === id);
@@ -201,9 +177,7 @@ function closePanel() {
   jobPanel.classList.add("hidden");
 }
 
-// ===========================
-// Mark Ready / Delete
-// ===========================
+// --- Mark job ready ---
 function markJobReady(id) {
   let jobs = getJobs();
   jobs = jobs.map(j => j.id === id ? { ...j, status: "Ready" } : j);
@@ -212,6 +186,7 @@ function markJobReady(id) {
   showToast("Job marked as completed");
 }
 
+// --- Delete job ---
 function deleteJob(id) {
   let jobs = getJobs();
   jobs = jobs.filter(j => j.id !== id);
@@ -220,9 +195,7 @@ function deleteJob(id) {
   showToast("Job deleted");
 }
 
-// ===========================
-// Open existing job via command
-// ===========================
+// --- Open existing job via command ---
 function openExistingJobPanel(command) {
   const jobs = getJobs();
   const job = jobs.find(j => command.includes(j.description.toLowerCase()));
@@ -234,25 +207,20 @@ function openExistingJobPanel(command) {
   }
 }
 
-// ===========================
-// Toast Notification
-// ===========================
+// --- Toast ---
 function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2000);
 }
 
-// ===========================
-// Event Listeners
-// ===========================
+// --- Event listeners ---
 saveJobBtn.addEventListener("click", saveJob);
 closePanelBtn.addEventListener("click", closePanel);
 dashboardMic.addEventListener("click", () => {
   if (recognition && !listening) recognition.start();
 });
 
-// ===========================
-// Initial Render
-// ===========================
+// --- Initial render ---
 renderJobs();
+if (currentJobId) openJobPanel(currentJobId);
