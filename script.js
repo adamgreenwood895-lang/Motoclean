@@ -2,11 +2,9 @@ let listening = false;
 
 const tapZone = document.getElementById("tapZone");
 const output = document.getElementById("output");
-const statusEl = document.getElementById("status");
 
 let recognition = null;
 
-// ---------------- SPEECH RECOGNITION ----------------
 if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -18,16 +16,13 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
 
   recognition.onstart = () => {
     listening = true;
-    output.textContent = "Listening...";
-    statusEl.textContent = "Speak a command now.";
     tapZone.classList.add("listening");
+    output.textContent = "Listening... Speak a command now.";
   };
 
   recognition.onresult = (event) => {
     const text = event.results[0][0].transcript.trim();
-
     output.textContent = text;
-    statusEl.textContent = "Command captured.";
 
     handleCommand(text);
   };
@@ -35,7 +30,7 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   recognition.onerror = () => {
     listening = false;
     tapZone.classList.remove("listening");
-    statusEl.textContent = "Mic error. Try again.";
+    output.textContent = "Mic error. Tap and try again.";
   };
 
   recognition.onend = () => {
@@ -44,21 +39,15 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
 
     if (
       !output.textContent ||
-      output.textContent === "Listening..."
+      output.textContent === "Listening... Speak a command now."
     ) {
       output.textContent = "Tap the mic and say a command.";
     }
-
-    if (statusEl.textContent === "Speak a command now.") {
-      statusEl.textContent = "";
-    }
   };
 } else {
-  statusEl.textContent =
-    "Speech recognition not supported in this browser.";
+  output.textContent = "Speech recognition is not supported on this device.";
 }
 
-// ---------------- TAP ZONE ----------------
 tapZone.addEventListener("click", () => {
   if (!recognition) return;
 
@@ -69,14 +58,13 @@ tapZone.addEventListener("click", () => {
   }
 });
 
-// ---------------- COMMAND HANDLER ----------------
 function handleCommand(command) {
   const cmd = command.toLowerCase();
 
   const newJobWords = ["create", "new", "book", "add"];
   const updateWords = ["update", "existing", "change", "complete", "ready"];
 
-  // ---------- CREATE NEW JOB ----------
+  // CREATE NEW JOB
   if (newJobWords.some(word => cmd.includes(word))) {
     const newJob = {
       id: Date.now().toString(),
@@ -91,17 +79,19 @@ function handleCommand(command) {
     jobs.push(newJob);
     localStorage.setItem("jobs", JSON.stringify(jobs));
 
-    // Tell dashboard which job to open
+    // Important: tells dashboard which job to open
     localStorage.setItem("currentJobId", newJob.id);
 
-    output.textContent = `Created ${newJob.reference}`;
-    statusEl.textContent = "Opening dashboard...";
+    output.textContent = `${newJob.reference} created. Opening dashboard...`;
 
-    window.location.href = "dashboard.html";
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 500);
+
     return;
   }
 
-  // ---------- UPDATE EXISTING JOB ----------
+  // UPDATE EXISTING JOB
   if (updateWords.some(word => cmd.includes(word))) {
     const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
 
@@ -109,10 +99,8 @@ function handleCommand(command) {
       const description = job.description.toLowerCase();
       const reference = job.reference.toLowerCase();
 
-      // Match reference directly
       if (cmd.includes(reference)) return true;
 
-      // Match significant words from description
       const importantWords = description
         .split(" ")
         .filter(word => word.length > 3);
@@ -123,21 +111,21 @@ function handleCommand(command) {
     if (matchedJob) {
       localStorage.setItem("currentJobId", matchedJob.id);
 
-      output.textContent = `Opening ${matchedJob.reference}`;
-      statusEl.textContent = "Opening dashboard...";
+      output.textContent = `${matchedJob.reference} found. Opening dashboard...`;
 
-      window.location.href = "dashboard.html";
-      return;
-    } else {
-      output.textContent = "No matching job found.";
-      statusEl.textContent =
-        "Try saying the customer name, bike model or job number.";
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 500);
+
       return;
     }
+
+    output.textContent =
+      "No matching job found. Try saying the customer name, bike model or job number.";
+
+    return;
   }
 
-  // ---------- UNKNOWN COMMAND ----------
-  output.textContent = "Command not recognised.";
-  statusEl.textContent =
-    "Try: 'Create new job for...' or 'Update John Smith Ducati job'";
-    }
+  output.textContent =
+    "Command not recognised. Try 'Create new job for...' or 'Update John Smith Ducati job'.";
+}
