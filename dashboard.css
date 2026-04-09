@@ -1,40 +1,148 @@
-/* Base body / dashboard */
-body, html {
+/* ---------- BASE STYLES ---------- */
+body {
   margin: 0;
-  padding: 0;
   font-family: Arial, sans-serif;
-  height: 100%;
+  background: #1a1a1a;
   color: #fff;
 }
 
-/* Dashboard container */
+/* ---------- GARAGE SKINS ---------- */
+body.motoflow {
+  background: url('assets/motoflow-bg.jpg') center/cover no-repeat;
+}
+body.truckflow {
+  background: url('assets/truckflow-bg.jpg') center/cover no-repeat;
+}
+body.washflow {
+  background: url('assets/washflow-bg.jpg') center/cover no-repeat;
+}
+body.autoflow {
+  background: url('assets/autoflow-bg.jpg') center/cover no-repeat;
+}
+
+/* ---------- DASHBOARD LAYOUT ---------- */
 .dashboard {
   padding: 20px;
+  background: rgba(0,0,0,0.6);
   min-height: 100vh;
-  border-radius: 12px;
 }
 
-/* Header */
-header {
+h1, h2 {
+  text-align: center;
+}
+
+.jobs-section {
+  margin-bottom: 30px;
+}
+
+.job-list {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 15px;
 }
 
-header h1 {
-  font-size: 1.8rem;
+.job-card {
+  background: rgba(255,255,255,0.05);
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
-.mic-btn {
-  font-size: 1rem;
-  padding: 8px 12px;
+.job-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.job-card.completed {
+  opacity: 0.7;
+}
+
+/* STATUS COLORS */
+.status-pending { color: #ffd700; }
+.status-inprogress { color: #00bfff; }
+.status-ready { color: #32cd32; }
+
+/* BUTTONS */
+.job-card button {
+  margin-top: 8px;
+  margin-right: 5px;
+  padding: 6px 10px;
   border: none;
-  border-radius: 6px;
   background: #000;
-  color: white;
+  color: #fff;
+  border-radius: 6px;
   cursor: pointer;
 }
+
+.job-card button:hover {
+  background: #222;
+}
+
+/* ---------- JOB PANEL ---------- */
+.job-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 320px;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.95);
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+
+.job-panel.hidden { display: none; }
+
+.job-panel textarea {
+  width: 100%;
+  min-height: 80px;
+  border-radius: 8px;
+  border: none;
+  padding: 10px;
+  resize: none;
+  font-size: 16px;
+}
+
+/* ---------- TOAST ---------- */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 200;
+}
+
+.toast.show { opacity: 1; }
+
+/* ---------- DASHBOARD MIC BUTTON ---------- */
+.dashboard-mic {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 24px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  padding: 12px;
+  cursor: pointer;
+  z-index: 300;
+}
+
+.dashboard-mic:hover {
+  background: rgba(0,0,0,0.9);
+}}
 
 /* Jobs section */
 .jobs-section {
