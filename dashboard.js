@@ -1,4 +1,5 @@
 const jobList = document.getElementById("jobList");
+const completedJobList = document.getElementById("completedJobList");
 const jobPanel = document.getElementById("jobPanel");
 const jobDesc = document.getElementById("jobDesc");
 const saveJobBtn = document.getElementById("saveJob");
@@ -76,7 +77,6 @@ function handleVoiceCommand(transcript) {
     jobs.push(newJob);
     localStorage.setItem("jobs", JSON.stringify(jobs));
 
-    // Redirect to dashboard
     window.location.href = "dashboard.html";
     return;
   }
@@ -90,30 +90,59 @@ function handleVoiceCommand(transcript) {
   showToast("Command not recognised");
 }
 
-// --- Job rendering ---
+// --- Job storage ---
 function getJobs() {
   return JSON.parse(localStorage.getItem("jobs") || "[]");
 }
 
+// --- Render jobs ---
 function renderJobs() {
   const jobs = getJobs();
+  const activeJobs = jobs.filter(j => j.status !== "Ready");
+  const completedJobs = jobs.filter(j => j.status === "Ready");
+
+  // Active jobs
   jobList.innerHTML = "";
-
-  if (!jobs.length) {
-    jobList.innerHTML = "<p>No jobs yet.</p>";
-    return;
-  }
-
-  jobs.forEach(job => {
+  if (!activeJobs.length) jobList.innerHTML = "<p>No active jobs.</p>";
+  activeJobs.forEach(job => {
     const div = document.createElement("div");
     div.className = "job-card";
     div.innerHTML = `
       <p><strong>${job.reference}</strong></p>
       <p>${job.description}</p>
       <span class="status-${job.status.toLowerCase()}">Status: ${job.status}</span>
+      <button class="mark-ready-btn">Mark Ready</button>
+      <button class="delete-btn">Delete</button>
     `;
+    div.querySelector(".mark-ready-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      markJobReady(job.id);
+    });
+    div.querySelector(".delete-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteJob(job.id);
+    });
     div.addEventListener("click", () => openJobPanel(job.id));
     jobList.appendChild(div);
+  });
+
+  // Completed jobs
+  completedJobList.innerHTML = "";
+  if (!completedJobs.length) completedJobList.innerHTML = "<p>No completed jobs.</p>";
+  completedJobs.forEach(job => {
+    const div = document.createElement("div");
+    div.className = "job-card completed";
+    div.innerHTML = `
+      <p><strong>${job.reference}</strong></p>
+      <p>${job.description}</p>
+      <span class="status-${job.status.toLowerCase()}">Status: ${job.status}</span>
+      <button class="delete-btn">Delete</button>
+    `;
+    div.querySelector(".delete-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteJob(job.id);
+    });
+    completedJobList.appendChild(div);
   });
 }
 
@@ -141,10 +170,27 @@ function closePanel() {
   jobPanel.classList.add("hidden");
 }
 
+// --- Mark job ready ---
+function markJobReady(id) {
+  let jobs = getJobs();
+  jobs = jobs.map(j => j.id === id ? { ...j, status: "Ready" } : j);
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+  renderJobs();
+  showToast("Job marked as completed");
+}
+
+// --- Delete job ---
+function deleteJob(id) {
+  let jobs = getJobs();
+  jobs = jobs.filter(j => j.id !== id);
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+  renderJobs();
+  showToast("Job deleted");
+}
+
 // --- Open existing job via command ---
 function openExistingJobPanel(command) {
   const jobs = getJobs();
-  // Simple search by customer/bike make/model in description
   const job = jobs.find(j => command.includes(j.description.toLowerCase()));
   if (job) {
     openJobPanel(job.id);
