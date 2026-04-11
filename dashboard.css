@@ -1,205 +1,75 @@
-/* ===========================
-   Dashboard Base Styles
-   =========================== */
 body.motoflow {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #111 100%);
-  position: relative;
-  font-family: Arial, sans-serif;
-  color: #fff;
   margin: 0;
-  min-height: 100vh;
+  font-family: Arial;
+  color: white;
+
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 0, 80, 0.15), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(255, 50, 0, 0.12), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.03), transparent 50%),
+    linear-gradient(180deg, #050505 0%, #140707 100%);
 }
 
-/* Optional subtle overlay for card readability */
-body.motoflow::before {
-  content: '';
+/* Layout */
+.sidebar {
+  width: 220px;
+  height: 100vh;
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(20px);
+  padding: 20px;
 }
 
-/* ===========================
-   Dashboard Layout
-   =========================== */
-.dashboard-container {
-  position: relative;
-  z-index: 1;
+.sidebar h2 {
+  color: red;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px 0;
+  opacity: 0.8;
+}
+
+.main {
+  margin-left: 220px;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
+}
+
+.topbar {
+  margin-bottom: 20px;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-/* Job List Styles */
-.job-section {
-  background: rgba(255, 255, 255, 0.05);
+/* Cards */
+.card {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(20px);
   border-radius: 12px;
   padding: 15px;
-  max-height: 60vh;
-  overflow-y: auto;
 }
 
-.job-section h2 {
-  margin: 0 0 10px 0;
-  font-size: 1.3rem;
-  color: #fff;
-}
-
+/* Job cards */
 .job-card {
-  background: rgba(0,0,0,0.6);
-  padding: 12px 15px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.job-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-}
-
-.job-card.completed {
-  background: rgba(0, 128, 0, 0.6);
-}
-
-.job-card p {
-  margin: 5px 0;
-}
-
-.status-pending {
-  color: #ffcc00;
-}
-
-.status-ready {
-  color: #00ff66;
-}
-
-/* Buttons in cards */
-.job-card button {
-  margin-top: 6px;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  background: #111;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.job-card button:hover {
-  background: #333;
-}
-
-/* ===========================
-   Job Panel (Popup)
-   =========================== */
-#jobPanel {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(20,20,20,0.95);
-  border-radius: 12px;
-  padding: 20px;
-  width: 400px;
-  max-width: 90%;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.7);
-}
-
-#jobPanel.hidden {
-  display: none;
-}
-
-#jobPanel textarea {
-  width: 100%;
+  background: rgba(255,255,255,0.05);
   padding: 10px;
+  margin-bottom: 10px;
   border-radius: 8px;
-  border: none;
-  resize: vertical;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
 }
 
-#jobPanel button {
-  align-self: flex-end;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  background: #111;
-  color: #fff;
-  cursor: pointer;
-}
-
-#jobPanel button:hover {
-  background: #333;
-}
-
-/* ===========================
-   Toast Notifications
-   =========================== */
-#toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.8);
-  color: #fff;
-  padding: 10px 18px;
-  border-radius: 8px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease-in-out;
-  z-index: 20;
-}
-
-#toast.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* ===========================
-   Dashboard Mic Button
-   =========================== */
+/* Mic */
 #dashboardMic {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: none;
-  background: #111;
-  color: #fff;
-  font-size: 1.5rem;
-  cursor: pointer;
-  z-index: 15;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  font-size: 20px;
 }
-
-#dashboardMic:hover {
-  background: #333;
-}
-
-/* ===========================
-   Scrollbar styling for job lists
-   =========================== */
-.job-section::-webkit-scrollbar {
-  width: 8px;
-}
-
-.job-section::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.05);
-}
-
-.job-section::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.3);
-  border-radius: 4px;
-  }
